@@ -1,0 +1,4 @@
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ./projects/03-fargate-app-platform/terraform  # ← Remove extra "aws-devops-platform"

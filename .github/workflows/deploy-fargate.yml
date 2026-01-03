@@ -1,4 +1,34 @@
+name: Deploy aws-devops-platform (Fargate)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS OIDC credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-arn: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+      
+      - uses: hashicorp/setup-terraform@v3
+      
       - name: Terraform Init
-        id: init
-        run: terraform init
-        working-directory: ./projects/03-fargate-app-platform/terraform  # ← Remove extra "aws-devops-platform"
+        run: cd projects/03-fargate-app-platform/terraform && terraform init
+      
+      - name: Terraform Plan
+        run: cd projects/03-fargate-app-platform/terraform && terraform plan
+      
+      - name: Terraform Apply
+        run: cd projects/03-fargate-app-platform/terraform && terraform apply -auto-approve
+      
+      - name: Show Outputs
+        run: cd projects/03-fargate-app-platform/terraform && terraform output -json

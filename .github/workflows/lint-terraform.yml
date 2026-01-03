@@ -1,0 +1,25 @@
+name: Terraform Lint
+
+on:
+  pull_request:
+    paths:
+      - '**/*.tf'
+
+jobs:
+  terraform-fmt-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate (Fargate project only)
+        working-directory: projects/03-fargate-app-platform/terraform
+        run: |
+          terraform init -backend=false
+          terraform validate

@@ -1,0 +1,57 @@
+name: Deploy aws-devops-platform (Fargate)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'aws-devops-platform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        working-directory: aws-devops-platform/projects/03-fargate-app-platform/terraform
+        run: terraform init -backend=false
+
+      - name: Terraform Plan
+        working-directory: aws-devops-platform/projects/03-fargate-app-platform/terraform
+        run: terraform plan
+
+  deploy:
+    needs: plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        working-directory: aws-devops-platform/projects/03-fargate-app-platform/terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: aws-devops-platform/projects/03-fargate-app-platform/terraform
+        run: terraform apply -auto-approve

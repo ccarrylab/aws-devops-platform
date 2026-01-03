@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.6.0"
   
   required_providers {
     aws = {
@@ -222,7 +222,7 @@ resource "aws_security_group" "eks_cluster" {
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.29"
+  version  = "1.28"
 
   vpc_config {
     subnet_ids              = aws_subnet.private[*].id
@@ -331,7 +331,7 @@ resource "aws_security_group" "rds" {
 resource "aws_rds_cluster" "main" {
   cluster_identifier      = "${var.project_name}-aurora"
   engine                  = "aurora-postgresql"
-  engine_version          = "16.11"
+  engine_version          = "15.4"
   database_name           = var.database_name
   master_username         = var.database_username
   master_password         = random_password.db_password.result
@@ -363,7 +363,6 @@ resource "aws_rds_cluster_instance" "main" {
 resource "random_password" "db_password" {
   length  = 32
   special = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 # Store DB password in Secrets Manager

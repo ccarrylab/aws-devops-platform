@@ -55,5 +55,5 @@ variable "monthly_budget" {
 variable "single_nat_gateway" {
   description = "Use single NAT gateway (saves $32/month, slightly less HA)"
   type        = bool
-  default     = false
+  default     = true
 }

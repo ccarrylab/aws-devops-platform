@@ -26,15 +26,12 @@ resource "aws_cloudwatch_dashboard" "app" {
       {
         type = "log"
         properties = {
-          region     = data.aws_region.current.name
+          region      = data.aws_region.current.name
           logGroupNames = [aws_cloudwatch_log_group.app.name]
-          title      = "${var.app_name} Logs"
+          title       = "${var.app_name} Logs"
         }
       }
     ]
   })
-
-  tags = {
-    App = var.app_name
-  }
+  # No tags block - aws_cloudwatch_dashboard doesn't support it
 }
